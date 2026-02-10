@@ -10,13 +10,15 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
     rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --primary: #4f46e5;
       --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
       --bg: #f8fafc;
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --text-main: #1e293b;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text-main: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
       --opportunity-bg: #fef9c3;
@@ -32,6 +34,27 @@
       --cyan-bg: #e0f2fe;
       --cyan-text: #075985;
       --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      --glass: rgba(255, 255, 255, 0.85);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
 
     * {
@@ -42,14 +65,16 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
+      background-color: #f8fafc;
       background-image:
-        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+        radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.08) 0, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.08) 0, transparent 40%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f46e5' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
       color: var(--text-main);
       line-height: 1.5;
-      padding: 2rem;
+      padding: 2.5rem;
       min-height: 100vh;
+      scroll-behavior: smooth;
     }
 
     .container {
@@ -77,12 +102,17 @@
 
     .card {
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 1rem;
-      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       box-shadow: var(--shadow);
       overflow: hidden;
-      transition: transform 0.2s ease;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     .table-responsive {
@@ -196,13 +226,13 @@
     }
 
     .btn {
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      border-radius: 9999px;
       border: 1px solid var(--border);
       background: white;
       color: var(--text-main);
-      font-size: 0.875rem;
-      font-weight: 500;
+      font-size: 0.8rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
@@ -278,6 +308,23 @@
       }
     }
 
+    @keyframes heartbeat {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.3);
+        opacity: 0.5;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
     /* Accordion Styles */
     tr.main-row {
       cursor: pointer;
@@ -289,8 +336,9 @@
     }
 
     tr.main-row.expanded td {
-      background-color: rgba(79, 70, 229, 0.03);
+      background-color: var(--primary-light) !important;
       border-bottom: none;
+      box-shadow: inset 4px 0 0 var(--primary);
     }
 
     .detail-row {
@@ -580,22 +628,26 @@
     }
 
     .filter-pill {
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
       border: 1px solid var(--border);
-      background: #f8fafc;
-      font-size: 0.825rem;
-      font-weight: 500;
+      background: white;
+      font-size: 0.8rem;
+      font-weight: 600;
       color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .filter-pill:hover {
-      background: #f1f5f9;
-      border-color: var(--primary-light);
+      background: var(--primary-light);
+      border-color: var(--primary);
       color: var(--primary);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
     }
 
     .filter-pill.active {
@@ -614,29 +666,64 @@
     }
 
     .stat-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s;
+      background: var(--glass);
+      padding: 1.75rem;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 100px;
+      height: 100px;
+      background: var(--primary);
+      opacity: 0.03;
+      border-radius: 50%;
+      z-index: -1;
     }
 
     .stat-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+      border-color: var(--primary-light);
+    }
+
+    .stat-card .stat-icon-bg {
+      position: absolute;
+      bottom: -10px;
+      right: -10px;
+      opacity: 0.05;
+      transform: rotate(-15deg);
+      transition: all 0.4s;
+    }
+
+    .stat-card:hover .stat-icon-bg {
+      transform: rotate(0deg) scale(1.1);
+      opacity: 0.1;
     }
 
     .stat-label {
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      font-weight: 500;
-      margin-bottom: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
     }
 
     .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.75rem;
+      font-weight: 800;
       color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
     }
 
     .stats-table-card {
@@ -935,6 +1022,212 @@
       background: white;
       z-index: 10;
     }
+
+    /* Analytics Section */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .analytics-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      height: 350px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .analytics-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-main);
+    }
+
+    .chart-container {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+
+    /* Filter Sidebar/Section Styling */
+    .filter-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+
+    .filter-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .filter-header h2 {
+      font-size: 1.1rem;
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+    }
+
+    .filters-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .filter-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-pill {
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-pill:hover {
+      background: var(--bg);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .filter-pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    .pill-value {
+      font-size: 0.7rem;
+      opacity: 0.8;
+      padding-left: 0.4rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      font-weight: 400;
+    }
+
+    .filter-pill.active .pill-value {
+      border-left-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .filter-pill:not(.active) .pill-value {
+      color: var(--text-muted);
+      border-left-color: var(--border);
+    }
+
+    .dropdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper select {
+      padding-left: 2.25rem !important;
+    }
+
+    .select-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .select-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f5f9;
+      color: #64748b;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 6px;
+      margin-right: 0.4rem;
+      border: 1px solid #e2e8f0;
+      min-width: 20px;
+    }
+
+    .cell-split {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .cell-line {
+      display: flex;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-main);
+    }
+
+    .label-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
   </style>
 </head>
 
@@ -948,32 +1241,43 @@
     <header>
       <div style="display: flex; align-items: center; gap: 1.5rem;">
         <img src="https://flashkartindia.com/img/logo.jpg" alt="Flashkart Logo"
-          style="height: 50px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+          style="height: 50px; border-radius: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.1);">
         <div style="display: flex; flex-direction: column;">
-          <h1 style="margin: 0;">Sales Pipeline Tracker <small
-              style="font-size: 1rem; font-weight: 400; color: var(--text-muted); display: inline-block; margin-left: 0.5rem;">FY
-              2025-26 Dashboard</small></h1>
-          <div id="lastUpdated" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.1rem;">
+            <div
+              style="width: 8px; height: 8px; background: #16a34a; border-radius: 50%; box-shadow: 0 0 10px rgba(22, 163, 74, 0.5); animation: heartbeat 2s infinite;">
+            </div>
+            <span
+              style="font-size: 0.65rem; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.1em;">System
+              Live</span>
+          </div>
+          <h1
+            style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 1.75rem; color: var(--text-main); line-height: 1.1;">
+            Enterprise Sales Hub <span
+              style="font-weight: 300; font-size: 1.1rem; color: var(--text-muted); padding-left: 0.5rem; opacity: 0.7;">v3.0
+              Dashboard</span></h1>
+          <div id="lastUpdated"
+            style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; font-weight: 500;"></div>
         </div>
       </div>
-      <div style="display: flex; gap: 1rem;">
+      <div style="display: flex; gap: 0.75rem;">
         <button class="btn" onclick="openNewRecordModal()"
-          style="display: flex; align-items: center; gap: 0.5rem; background: #16a34a; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
+          style="height: 44px; padding: 0 1.5rem; background: #16a34a; color: white; border: none; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);">
+          <svg style="margin-right: 8px;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="3">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-          Add New Lead
+          Add Lead
         </button>
         <button class="btn" onclick="loadPipeline()"
-          style="display: flex; align-items: center; gap: 0.5rem; background: var(--primary); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M23 4v6h-6"></path>
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          style="height: 44px; padding: 0 1.25rem; background: white; border-color: var(--primary); color: var(--primary);">
+          <svg style="margin-right: 8px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="M23 4v6h-6" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
           </svg>
-          Refresh Data
+          Sync
         </button>
       </div>
     </header>
@@ -982,38 +1286,207 @@
       <div class="stat-card">
         <div class="stat-label">Total Pipeline Value</div>
         <div class="stat-value" id="totalPipelineValue">₹0</div>
+        <svg class="stat-icon-bg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
       </div>
       <div class="stat-card">
         <div class="stat-label">Total Won Revenue</div>
         <div class="stat-value" id="totalWonValue" style="color: #16a34a;">₹0</div>
+        <svg class="stat-icon-bg" style="color:#16a34a" width="60" height="60" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
       </div>
       <div class="stat-card">
         <div class="stat-label">Total Lost Value</div>
         <div class="stat-value" id="totalLostValue" style="color: #ef4444;">₹0</div>
+        <svg class="stat-icon-bg" style="color:#ef4444" width="60" height="60" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="15" y1="9" x2="9" y2="15" />
+          <line x1="9" y1="9" x2="15" y2="15" />
+        </svg>
       </div>
       <div class="stat-card">
         <div class="stat-label">Active Leads</div>
         <div class="stat-value" id="activeLeadsCount">0</div>
+        <svg class="stat-icon-bg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
       </div>
     </div>
 
-    <div class="stats-table-card">
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+          </svg>
+          Pipeline Mix by Stage
+        </h3>
+        <div class="chart-container">
+          <canvas id="stageChart"></canvas>
+        </div>
+      </div>
+      <div class="analytics-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+          </svg>
+          Owner Performance (Active Deal Value)
+        </h3>
+        <div class="chart-container">
+          <canvas id="ownerChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
       <div
-        style="padding: 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-size: 1.1rem;">Person-wise Deal Value Split</h3>
-        <span style="font-size: 0.75rem; color: var(--text-muted);">Values in INR</span>
+        style="background: linear-gradient(to right, #f8fafc, #ffffff); padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem;">
+        <div
+          style="background: white; color: var(--primary); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        </div>
+        <h2
+          style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">
+          Precision Filter Suite</h2>
+        <button class="btn"
+          style="margin-left: auto; font-size: 0.7rem; height: 32px; padding: 0 1rem; border-radius: 6px; border-color: #cbd5e1;"
+          onclick="resetFilters()">Clear View</button>
+      </div>
+
+      <div class="filters-container">
+        <!-- Sales Owners -->
+        <div class="filter-group">
+          <div class="filter-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Sales Owner Focus
+          </div>
+          <div class="filter-pills-row" id="ownerFilters">
+            <!-- Dynamic items with values -->
+          </div>
+        </div>
+
+        <!-- Stages -->
+        <div class="filter-group">
+          <div class="filter-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11"></path>
+              <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
+              <path d="M7 14v-4"></path>
+              <path d="M11 14v-6"></path>
+            </svg>
+            Deal Stage Tracking
+          </div>
+          <div class="filter-pills-row" id="stageFilters">
+            <!-- Dynamic items with values -->
+          </div>
+        </div>
+
+        <!-- Dropdown Grid for other fields -->
+        <div class="dropdown-grid">
+          <div class="filter-group">
+            <div class="filter-label">Project Scope</div>
+            <div class="select-wrapper">
+              <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+              </svg>
+              <select onchange="filterByScope(this.value)" class="filter-input" id="scopeFilterSelect">
+                <option value="">All Scopes</option>
+                <option value="DPKGG">DPKGG</option>
+                <option value="EPKGG">EPKGG</option>
+                <option value="Warehousing">Warehousing</option>
+                <option value="Transportation Services">Transportation Services</option>
+                <option value="3PL Operation">3PL Operation</option>
+                <option value="RPKGG">RPKGG</option>
+                <option value="Frieght Farwarding">Frieght Farwarding</option>
+                <option value="EPKGG&FRTFF">EPKGG&FRTFF</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-label">Billing Type</div>
+            <div class="select-wrapper">
+              <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              <select onchange="filterByRecurring(this.value)" class="filter-input" id="typeFilterSelect">
+                <option value="">All Types</option>
+                <option value="Series">Series</option>
+                <option value="One Time">One Time</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-label">Business Type</div>
+            <div class="select-wrapper">
+              <svg class="select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              <select onchange="filterByBusinessType(this.value)" class="filter-input" id="businessTypeFilterSelect">
+                <option value="">All Business Types</option>
+                <option value="New">New</option>
+                <option value="Existing">Existing</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+      <div
+        style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to right, #f8fafc, #ffffff);">
+        <h2
+          style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem; color: var(--text-main);">
+          <div style="background: var(--primary-light); color: var(--primary); padding: 6px; border-radius: 6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <polyline points="17 11 19 13 23 9" />
+            </svg>
+          </div>
+          Executive Performance Matrix
+        </h2>
+        <span
+          style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; background: #f1f5f9; padding: 4px 10px; border-radius: 4px;">Valuation:
+          INR</span>
       </div>
       <div style="overflow-x: auto;">
         <table class="stats-table">
           <thead>
             <tr>
-              <th>Sales Owner</th>
-              <th>Opportunity</th>
-              <th>Demo</th>
-              <th>Quote/Deal</th>
-              <th>Won</th>
-              <th>Lost</th>
-              <th style="background: #f1f5f9;">Total Value</th>
+              <th style="min-width: 140px;">Sales Owner</th>
+              <th style="min-width: 150px;">Business Type</th>
+              <th style="min-width: 150px;">Billing Model</th>
+              <th style="min-width: 150px;">Live Pipeline</th>
+              <th style="min-width: 140px;">Win Performance</th>
+              <th style="background: #f1f5f9; min-width: 130px;">Total Potential</th>
             </tr>
           </thead>
           <tbody id="ownerStatsBody">
@@ -1023,57 +1496,7 @@
       </div>
     </div>
 
-    <div class="quick-filters" id="ownerFilters">
-      <span
-        style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); min-width: 100px;">Sales
-        Owner:</span>
-      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-        <button class="filter-pill active" onclick="filterByOwner('')">All Owners</button>
-        <button class="filter-pill" onclick="filterByOwner('Vicky')">Vicky</button>
-        <button class="filter-pill" onclick="filterByOwner('Logesh')">Logesh</button>
-        <button class="filter-pill" onclick="filterByOwner('George')">George</button>
-        <button class="filter-pill" onclick="filterByOwner('Venkat')">Venkat</button>
-        <button class="filter-pill" onclick="filterByOwner('Arjun')">Arjun</button>
-        <button class="filter-pill" onclick="filterByOwner('Ajay')">Ajay</button>
-        <button class="filter-pill" onclick="filterByOwner('Sasi')">Sasi</button>
-        <button class="filter-pill" onclick="filterByOwner('Hari')">Hari</button>
-        <button class="filter-pill" onclick="filterByOwner('Dinesh')">Dinesh</button>
-      </div>
-    </div>
 
-    <div class="quick-filters" id="stageFilters" style="margin-top: -0.75rem; margin-bottom: 2rem;">
-      <span
-        style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); min-width: 100px;">Stage:</span>
-      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-        <button class="filter-pill active" onclick="filterByStage('')">All Stages</button>
-        <button class="filter-pill" onclick="filterByStage('Opportunity')">Opportunity</button>
-        <button class="filter-pill" onclick="filterByStage('Demo')">Demo</button>
-        <button class="filter-pill" onclick="filterByStage('Quote')">Quote/Deal</button>
-        <button class="filter-pill" onclick="filterByStage('Won')">Won</button>
-        <button class="filter-pill" onclick="filterByStage('Lost')">Lost</button>
-      </div>
-      <select onchange="filterByScope(this.value)" class="filter-input"
-        style="width: auto; min-width: 200px; height: 38px;">
-        <option value="">All Scopes</option>
-        <option value="DPKGG">DPKGG</option>
-        <option value="EPKGG">EPKGG</option>
-        <option value="Warehousing">Warehousing</option>
-        <option value="Transportation Services">Transportation Services</option>
-        <option value="3PL Operation">3PL Operation</option>
-        <option value="RPKGG">RPKGG</option>
-        <option value="Frieght Farwarding">Frieght Farwarding</option>
-        <option value="EPKGG&FRTFF">EPKGG&FRTFF</option>
-      </select>
-
-      <span
-        style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); min-width: 100px; margin-left: 2rem;">Type:</span>
-      <select onchange="filterByRecurring(this.value)" class="filter-input"
-        style="width: auto; min-width: 150px; height: 38px;">
-        <option value="">All Types</option>
-        <option value="Series">Series</option>
-        <option value="One Time">One Time</option>
-      </select>
-    </div>
 
     <div class="card">
       <div class="table-responsive">
@@ -1141,8 +1564,19 @@
       }
     }
 
+    let stageChart = null;
+    let ownerChart = null;
+
     function calculateDashboardStats(data) {
       const stats = {};
+      const stageTotals = {
+        'Opportunity': 0,
+        'Demo': 0,
+        'Quote/Deal': 0,
+        'Won': 0,
+        'Lost': 0
+      };
+
       let totalPipeline = 0;
       let totalWon = 0;
       let totalLost = 0;
@@ -1155,28 +1589,63 @@
         };
 
         const owner = getVal("Sales Owner") || "Unassigned";
-        const stage = (getVal("Stage") || "").toLowerCase().trim();
+        const stageRaw = (getVal("Stage") || "").toLowerCase().trim();
         const status = (getVal("Status") || "").toLowerCase().trim();
+        const bType = (getVal("Business Type") || "New").trim();
+        const rType = (getVal("Recurring/One Time") || "One Time").trim();
         const rawValue = getVal("Deal Value (INR)");
         const value = parseFloat(rawValue.toString().replace(/[^0-9.-]+/g, "")) || 0;
 
         if (!stats[owner]) {
-          stats[owner] = { opportunity: 0, demo: 0, quote: 0, won: 0, lost: 0, total: 0 };
+          stats[owner] = {
+            oppVal: 0, oppCount: 0,
+            demoVal: 0, demoCount: 0,
+            quoteVal: 0, quoteCount: 0,
+            wonVal: 0, wonCount: 0,
+            lostVal: 0, lostCount: 0,
+            newVal: 0, newCount: 0,
+            extVal: 0, extCount: 0,
+            seriesVal: 0, seriesCount: 0,
+            oneTimeVal: 0, oneTimeCount: 0,
+            total: 0, activeValue: 0
+          };
         }
 
-        if (status === "won" || stage === "won") {
-          stats[owner].won += value;
+        // Map internal stage logic
+        let stageCategory = "";
+        if (status === "won" || stageRaw === "won") stageCategory = "Won";
+        else if (status === "lost" || stageRaw === "lost") stageCategory = "Lost";
+        else if (stageRaw.includes("opportunity")) stageCategory = "Opportunity";
+        else if (stageRaw.includes("demo")) stageCategory = "Demo";
+        else stageCategory = "Quote/Deal";
+
+        // Aggregate Business Type
+        if (bType === "New") { stats[owner].newVal += value; stats[owner].newCount++; }
+        else { stats[owner].extVal += value; stats[owner].extCount++; }
+
+        // Aggregate Recurring Type
+        if (rType === "Series") { stats[owner].seriesVal += value; stats[owner].seriesCount++; }
+        else { stats[owner].oneTimeVal += value; stats[owner].oneTimeCount++; }
+
+        if (stageCategory === "Won") {
+          stats[owner].wonVal += value;
+          stats[owner].wonCount++;
           totalWon += value;
-        } else if (status === "lost" || stage === "lost") {
-          stats[owner].lost += value;
+          stageTotals['Won'] += value;
+        } else if (stageCategory === "Lost") {
+          stats[owner].lostVal += value;
+          stats[owner].lostCount++;
           totalLost += value;
+          stageTotals['Lost'] += value;
         } else {
-          if (stage.includes("opportunity")) stats[owner].opportunity += value;
-          else if (stage.includes("demo")) stats[owner].demo += value;
-          else stats[owner].quote += value; // Default/Quote/Deal
+          if (stageCategory === "Opportunity") { stats[owner].oppVal += value; stats[owner].oppCount++; }
+          else if (stageCategory === "Demo") { stats[owner].demoVal += value; stats[owner].demoCount++; }
+          else { stats[owner].quoteVal += value; stats[owner].quoteCount++; }
 
           totalPipeline += value;
           activeLeads++;
+          stats[owner].activeValue += value;
+          stageTotals[stageCategory] += value;
         }
         stats[owner].total += value;
       });
@@ -1187,24 +1656,192 @@
       document.getElementById("totalLostValue").textContent = `₹${formatCurrency(totalLost)}`;
       document.getElementById("activeLeadsCount").textContent = activeLeads;
 
+      updateFilterAnalytics(stats, stageTotals);
+      updateCharts(stats, stageTotals);
+
       // Update Owner Breakdown Table
       const tbody = document.getElementById("ownerStatsBody");
       tbody.innerHTML = "";
 
       Object.keys(stats).sort().forEach(owner => {
         const s = stats[owner];
+        const totalClosed = s.wonCount + s.lostCount;
+        const winRate = totalClosed > 0 ? Math.round((s.wonCount / totalClosed) * 100) : 0;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td style="font-weight: 600; color: var(--primary);">${owner}</td>
-          <td><span class="val-pill val-opp">₹${formatCurrency(s.opportunity)}</span></td>
-          <td><span class="val-pill val-demo">₹${formatCurrency(s.demo)}</span></td>
-          <td><span class="val-pill val-deal">₹${formatCurrency(s.quote)}</span></td>
-          <td><span class="val-pill val-won">₹${formatCurrency(s.won)}</span></td>
-          <td><span class="val-pill val-lost">₹${formatCurrency(s.lost)}</span></td>
-          <td style="font-weight: 700; background: #f8fafc;">₹${formatCurrency(s.total)}</td>
+          <td style="font-weight: 700; color: var(--primary); vertical-align: top;">${owner}</td>
+          
+          <td>
+            <div class="cell-split">
+              <div class="cell-line"><div class="label-dot" style="background:#16a34a;"></div><span class="count-badge">${s.newCount}</span>New: <b>₹${formatCompactValue(s.newVal)}</b></div>
+              <div class="cell-line"><div class="label-dot" style="background:#cbd5e1;"></div><span class="count-badge">${s.extCount}</span>Ext: <b>₹${formatCompactValue(s.extVal)}</b></div>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-split">
+              <div class="cell-line"><span class="count-badge">${s.seriesCount}</span>Series: <b>₹${formatCompactValue(s.seriesVal)}</b></div>
+              <div class="cell-line"><span class="count-badge">${s.oneTimeCount}</span>O-Time: <b>₹${formatCompactValue(s.oneTimeVal)}</b></div>
+            </div>
+          </td>
+
+          <td>
+            <div class="cell-split">
+              <div class="cell-line"><div class="label-dot" style="background:#818cf8;"></div><span class="count-badge">${s.oppCount}</span>Opp: ₹${formatCompactValue(s.oppVal)}</div>
+              <div class="cell-line"><div class="label-dot" style="background:#4f46e5;"></div><span class="count-badge">${s.quoteCount}</span>Deal: ₹${formatCompactValue(s.quoteVal)}</div>
+            </div>
+          </td>
+
+          <td style="vertical-align: top;">
+            <div class="cell-split">
+              <div class="cell-line" style="font-weight:600; color:var(--text-main)">Win Rate: ${winRate}%</div>
+              <div class="win-p-container" style="height:6px; margin:0; background:#f1f5f9; border:1px solid #e2e8f0">
+                <div class="win-p-fill" style="width:${winRate}%; background:${winRate > 50 ? '#16a34a' : '#fbbf24'}"></div>
+              </div>
+              <div class="cell-line" style="font-size:0.7rem; color:var(--text-muted)">${s.wonCount} won of ${totalClosed} closed</div>
+            </div>
+          </td>
+
+          <td style="font-weight: 800; background: #f8fafc; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--text-main); vertical-align: middle;">
+            ₹${formatCurrency(s.total)}
+          </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function updateFilterAnalytics(ownerStats, stageTotals) {
+      // Owner Pills
+      const ownerContainer = document.getElementById("ownerFilters");
+      const activeOwner = activeFilters["Sales Owner"] || "";
+
+      let ownerHTML = `<button class="filter-pill ${activeOwner === '' ? 'active' : ''}" onclick="filterByOwner('')">All Owners</button>`;
+
+      Object.keys(ownerStats).sort().forEach(owner => {
+        const isActive = activeOwner === owner;
+        const valShort = formatCompactValue(ownerStats[owner].activeValue);
+        ownerHTML += `
+          <button class="filter-pill ${isActive ? 'active' : ''}" onclick="filterByOwner('${owner}')">
+            ${owner} <span class="pill-value">₹${valShort}</span>
+          </button>
+        `;
+      });
+      ownerContainer.innerHTML = ownerHTML;
+
+      // Stage Pills
+      const stageContainer = document.getElementById("stageFilters");
+      const activeStage = activeFilters["Stage"] || "";
+
+      const stages = [
+        { id: '', label: 'All Stages', total: 0 },
+        { id: 'Opportunity', label: 'Opportunity', total: stageTotals['Opportunity'] },
+        { id: 'Demo', label: 'Demo', total: stageTotals['Demo'] },
+        { id: 'Quote', label: 'Quote/Deal', total: stageTotals['Quote/Deal'] },
+        { id: 'Won', label: 'Won', total: stageTotals['Won'] },
+        { id: 'Lost', label: 'Lost', total: stageTotals['Lost'] }
+      ];
+
+      stageContainer.innerHTML = stages.map(s => {
+        const isActive = (activeStage === s.id) || (s.id === 'Quote' && activeStage === 'Quote');
+        return `
+          <button class="filter-pill ${isActive ? 'active' : ''}" onclick="filterByStage('${s.id}')">
+            ${s.label} ${s.total > 0 ? `<span class="pill-value">₹${formatCompactValue(s.total)}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function updateCharts(ownerStats, stageTotals) {
+      if (!window.Chart) return;
+
+      // 1. Stage Chart (Doughnut)
+      const stageCtx = document.getElementById('stageChart').getContext('2d');
+      const stageLabels = ['Opportunity', 'Demo', 'Quote/Deal'];
+      const stageData = [stageTotals['Opportunity'], stageTotals['Demo'], stageTotals['Quote/Deal']];
+
+      if (stageChart) {
+        stageChart.data.datasets[0].data = stageData;
+        stageChart.update();
+      } else {
+        stageChart = new Chart(stageCtx, {
+          type: 'doughnut',
+          data: {
+            labels: stageLabels,
+            datasets: [{
+              data: stageData,
+              backgroundColor: ['#818cf8', '#fbbf24', '#4f46e5'],
+              borderWidth: 0,
+              hoverOffset: 10
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            },
+            cutout: '70%'
+          }
+        });
+      }
+
+      // 2. Owner Performance (Horizontal Bar)
+      const ownerCtx = document.getElementById('ownerChart').getContext('2d');
+      const owners = Object.keys(ownerStats).filter(o => ownerStats[o].activeValue > 0).sort((a, b) => ownerStats[b].activeValue - ownerStats[a].activeValue);
+      const ownerValues = owners.map(o => ownerStats[o].activeValue);
+
+      if (ownerChart) {
+        ownerChart.data.labels = owners;
+        ownerChart.data.datasets[0].data = ownerValues;
+        ownerChart.update();
+      } else {
+        ownerChart = new Chart(ownerCtx, {
+          type: 'bar',
+          data: {
+            labels: owners,
+            datasets: [{
+              label: 'Active Pipeline (INR)',
+              data: ownerValues,
+              backgroundColor: '#4f46e5',
+              borderRadius: 6,
+              barThickness: 20
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { callback: v => '₹' + formatCompactValue(v) } },
+              y: { grid: { display: false } }
+            }
+          }
+        });
+      }
+    }
+
+    function formatCompactValue(val) {
+      if (val >= 10000000) return (val / 10000000).toFixed(1) + 'Cr';
+      if (val >= 100000) return (val / 100000).toFixed(1) + 'L';
+      if (val >= 1000) return (val / 1000).toFixed(1) + 'k';
+      return val.toString();
+    }
+
+    function resetFilters() {
+      activeFilters = {};
+      document.querySelectorAll('.filter-input').forEach(i => i.value = '');
+      applyFilters();
+      calculateDashboardStats(pipelineData); // Redraw pills
+    }
+
+    function filterByBusinessType(val) {
+      if (val) activeFilters["Business Type"] = val;
+      else delete activeFilters["Business Type"];
+      applyFilters();
     }
 
     function applyFilters() {
@@ -1311,6 +1948,10 @@
         const mainTr = document.createElement("tr");
         mainTr.className = "main-row";
         mainTr.dataset.target = rowId;
+
+        // Staggered entry animation
+        mainTr.style.animation = `fadeIn 0.4s ease forwards ${index * 0.05}s`;
+        mainTr.style.opacity = '0';
 
         // Robust data retrieval
         const getVal = (keyName) => {
@@ -1723,37 +2364,18 @@
       lastUpdatedEl.textContent = `Last updated: ${now.toLocaleTimeString()}`;
     }
 
-    function filterByOwner(name) {
-      // Update owner pills UI
-      document.querySelectorAll('#ownerFilters .filter-pill').forEach(pill => {
-        if (pill.textContent === name || (name === '' && pill.textContent === 'All Owners')) {
-          pill.classList.add('active');
-        } else {
-          pill.classList.remove('active');
-        }
-      });
-
-      // Update active filters
-      activeFilters["Sales Owner"] = name;
+    function filterByOwner(owner) {
+      if (owner) activeFilters["Sales Owner"] = owner;
+      else delete activeFilters["Sales Owner"];
       applyFilters();
+      calculateDashboardStats(pipelineData);
     }
 
     function filterByStage(stage) {
-      // Update stage pills UI
-      document.querySelectorAll('#stageFilters .filter-pill').forEach(pill => {
-        const text = pill.textContent;
-        if (text === stage ||
-          (stage === '' && text === 'All Stages') ||
-          (stage === 'Quote' && text === 'Quote/Deal')) {
-          pill.classList.add('active');
-        } else {
-          pill.classList.remove('active');
-        }
-      });
-
-      // Update active filters
-      activeFilters["Stage"] = stage;
+      if (stage) activeFilters["Stage"] = stage;
+      else delete activeFilters["Stage"];
       applyFilters();
+      calculateDashboardStats(pipelineData);
     }
 
     function filterByScope(scope) {
@@ -1877,20 +2499,34 @@
 
   </script>
   <!-- New Record Modal -->
-  <div class="modal-overlay" id="newRecordModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="margin:0; font-family:'Outfit', sans-serif;">Create New Sales Lead</h3>
+  <div class="modal-overlay" id="newRecordModal" style="backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.4);">
+    <div class="modal-content"
+      style="border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: var(--shadow-lg);">
+      <div class="modal-header"
+        style="background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%); padding: 1.5rem 2rem; border: none;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div
+            style="background: rgba(255, 255, 255, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="16" y1="11" x2="22" y2="11" />
+            </svg>
+          </div>
+          <h3 style="margin:0; font-family:'Outfit', sans-serif; color: white; font-size: 1.25rem;">Onboard New Sales
+            Lead</h3>
+        </div>
         <button class="btn" onclick="closeNewRecordModal()"
-          style="min-width:auto; padding:0.5rem; border:none; background:transparent;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          style="min-width:auto; padding:0.5rem; border:none; background:rgba(255, 255, 255, 0.1); color: white; border-radius: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
       </div>
-      <form id="newRecordForm" onsubmit="submitNewRecord(event)">
-        <div class="modal-body">
+      <form id="newRecordForm" onsubmit="submitNewRecord(event)" style="background: white;">
+        <div class="modal-body" style="padding: 2rem;">
           <div class="form-grid">
             <div class="form-group">
               <label class="form-label">Project Name</label>
@@ -1954,16 +2590,19 @@
             </div>
             <div class="form-group full-width">
               <label class="form-label">Initial Notes</label>
-              <textarea name="Notes" class="form-input" rows="3" placeholder="Add some context..."></textarea>
+              <textarea name="Notes" class="form-input" rows="3" placeholder="Add some context..."
+                style="resize: none;"></textarea>
             </div>
           </div>
-          <div id="modalStatus" class="status-msg"></div>
+          <div id="modalStatus" class="status-msg" style="margin-top: 1rem;"></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer"
+          style="padding: 1.5rem 2rem; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem;">
           <button type="button" class="btn" onclick="closeNewRecordModal()"
-            style="border:none; color:var(--text-muted);">Cancel</button>
+            style="border:none; background:transparent; color:var(--text-muted); font-weight: 600;">Discard</button>
           <button type="submit" class="btn"
-            style="background: #16a34a; color: white; border: none; padding: 0.75rem 2rem;">Create Lead</button>
+            style="background: #16a34a; color: white; border: none; padding: 0.75rem 2.5rem; font-weight: 700; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);">Onboard
+            Lead</button>
         </div>
       </form>
     </div>
