@@ -78,8 +78,21 @@
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1440px;
       margin: 0 auto;
+      animation: entrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes entrance {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     header {
@@ -102,17 +115,37 @@
 
     .card {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 1.25rem;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
       box-shadow: var(--shadow);
       overflow: hidden;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transform: rotate(45deg);
+      pointer-events: none;
+      transition: 0.6s;
     }
 
     .card:hover {
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-lg), 0 0 20px rgba(79, 70, 229, 0.1);
+      transform: translateY(-2px);
+      border-color: rgba(79, 70, 229, 0.3);
+    }
+
+    .card:hover::after {
+      left: 100%;
     }
 
     .table-responsive {
@@ -144,10 +177,11 @@
 
     .filter-input {
       width: 100%;
-      padding: 0.4rem 0.6rem;
+      padding: 0.6rem 0.75rem;
+      height: 42px;
       border: 1px solid var(--border);
-      border-radius: 0.375rem;
-      font-size: 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
       font-family: inherit;
       color: var(--text-main);
       transition: all 0.2s;
@@ -167,7 +201,16 @@
     }
 
     tr:hover td {
-      background-color: rgba(79, 70, 229, 0.02);
+      background-color: rgba(79, 70, 229, 0.04) !important;
+      color: var(--primary);
+    }
+
+    tr.main-row {
+      transition: all 0.2s ease;
+    }
+
+    tr.main-row:hover {
+      box-shadow: inset 4px 0 0 var(--primary);
     }
 
     /* Stage Tags */
@@ -667,47 +710,68 @@
 
     .stat-card {
       background: var(--glass);
-      padding: 1.75rem;
-      border-radius: 1.25rem;
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 2rem;
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.6);
       box-shadow: var(--shadow-sm);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
       position: relative;
       overflow: hidden;
       z-index: 1;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .stat-card:nth-child(even) {
+      animation-delay: -3s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
     .stat-card::before {
       content: '';
       position: absolute;
-      top: -20px;
-      right: -20px;
-      width: 100px;
-      height: 100px;
-      background: var(--primary);
-      opacity: 0.03;
-      border-radius: 50%;
-      z-index: -1;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .stat-card:hover::before {
+      left: 100%;
     }
 
     .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow);
-      border-color: var(--primary-light);
+      transform: translateY(-12px) scale(1.02) !important;
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
     }
 
     .stat-card .stat-icon-bg {
       position: absolute;
-      bottom: -10px;
-      right: -10px;
-      opacity: 0.05;
+      bottom: -15px;
+      right: -15px;
+      opacity: 0.08;
       transform: rotate(-15deg);
-      transition: all 0.4s;
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      filter: grayscale(1);
     }
 
     .stat-card:hover .stat-icon-bg {
-      transform: rotate(0deg) scale(1.1);
-      opacity: 0.1;
+      transform: rotate(0deg) scale(1.4);
+      opacity: 0.15;
+      filter: grayscale(0);
     }
 
     .stat-label {
@@ -1026,7 +1090,7 @@
     /* Analytics Section */
     .analytics-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
@@ -1087,6 +1151,7 @@
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      margin-left: 2rem;
     }
 
     .filter-group {
@@ -1164,8 +1229,10 @@
 
     .dropdown-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      margin-right: 1rem;
     }
 
     .select-wrapper {
@@ -1173,7 +1240,7 @@
     }
 
     .select-wrapper select {
-      padding-left: 2.25rem !important;
+      padding-left: 2.75rem !important;
     }
 
     .select-icon {
@@ -1350,6 +1417,18 @@
           <canvas id="ownerChart"></canvas>
         </div>
       </div>
+      <div class="analytics-card">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+          </svg>
+          Pipeline Mix by Scope
+        </h3>
+        <div class="chart-container">
+          <canvas id="scopeChart"></canvas>
+        </div>
+      </div>
     </div>
 
     <div class="card" style="margin-bottom: 2rem;">
@@ -1485,7 +1564,7 @@
               <th style="min-width: 150px;">Business Type</th>
               <th style="min-width: 150px;">Billing Model</th>
               <th style="min-width: 150px;">Live Pipeline</th>
-              <th style="min-width: 140px;">Win Performance</th>
+              <th style="min-width: 150px;">Win Rate (%)</th>
               <th style="background: #f1f5f9; min-width: 130px;">Total Potential</th>
             </tr>
           </thead>
@@ -1566,6 +1645,7 @@
 
     let stageChart = null;
     let ownerChart = null;
+    let scopeChart = null;
 
     function calculateDashboardStats(data) {
       const stats = {};
@@ -1576,6 +1656,7 @@
         'Won': 0,
         'Lost': 0
       };
+      const scopeTotals = {};
 
       let totalPipeline = 0;
       let totalWon = 0;
@@ -1593,6 +1674,7 @@
         const status = (getVal("Status") || "").toLowerCase().trim();
         const bType = (getVal("Business Type") || "New").trim();
         const rType = (getVal("Recurring/One Time") || "One Time").trim();
+        const scope = (getVal("Scope") || "Unspecified").trim();
         const rawValue = getVal("Deal Value (INR)");
         const value = parseFloat(rawValue.toString().replace(/[^0-9.-]+/g, "")) || 0;
 
@@ -1648,6 +1730,11 @@
           stageTotals[stageCategory] += value;
         }
         stats[owner].total += value;
+        // Aggregate Scope Totals
+        if (value > 0) {
+          if (!scopeTotals[scope]) scopeTotals[scope] = 0;
+          scopeTotals[scope] += value;
+        }
       });
 
       // Update Summary Cards
@@ -1657,7 +1744,7 @@
       document.getElementById("activeLeadsCount").textContent = activeLeads;
 
       updateFilterAnalytics(stats, stageTotals);
-      updateCharts(stats, stageTotals);
+      updateCharts(stats, stageTotals, scopeTotals);
 
       // Update Owner Breakdown Table
       const tbody = document.getElementById("ownerStatsBody");
@@ -1665,8 +1752,8 @@
 
       Object.keys(stats).sort().forEach(owner => {
         const s = stats[owner];
-        const totalClosed = s.wonCount + s.lostCount;
-        const winRate = totalClosed > 0 ? Math.round((s.wonCount / totalClosed) * 100) : 0;
+        const totalEffort = s.wonCount + s.lostCount + s.oppCount + s.demoCount + s.quoteCount;
+        const winRate = totalEffort > 0 ? Math.round((s.wonCount / totalEffort) * 100) : 0;
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -1689,21 +1776,29 @@
           <td>
             <div class="cell-split">
               <div class="cell-line"><div class="label-dot" style="background:#818cf8;"></div><span class="count-badge">${s.oppCount}</span>Opp: ₹${formatCompactValue(s.oppVal)}</div>
+              <div class="cell-line"><div class="label-dot" style="background:#fbbf24;"></div><span class="count-badge">${s.demoCount}</span>Lead: ₹${formatCompactValue(s.demoVal)}</div>
               <div class="cell-line"><div class="label-dot" style="background:#4f46e5;"></div><span class="count-badge">${s.quoteCount}</span>Deal: ₹${formatCompactValue(s.quoteVal)}</div>
             </div>
           </td>
 
           <td style="vertical-align: top;">
             <div class="cell-split">
-              <div class="cell-line" style="font-weight:600; color:var(--text-main)">Win Rate: ${winRate}%</div>
-              <div class="win-p-container" style="height:6px; margin:0; background:#f1f5f9; border:1px solid #e2e8f0">
-                <div class="win-p-fill" style="width:${winRate}%; background:${winRate > 50 ? '#16a34a' : '#fbbf24'}"></div>
+              <div class="cell-line" style="font-weight:700; color:var(--text-main); font-size:1.1rem; justify-content: space-between;">
+                <span>${winRate}%</span>
+                <span style="font-size: 0.7rem; font-weight: 500; color: var(--text-muted);">Efficiency</span>
               </div>
-              <div class="cell-line" style="font-size:0.7rem; color:var(--text-muted)">${s.wonCount} won of ${totalClosed} closed</div>
+              <div class="win-p-container" style="height:8px; margin:4px 0; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:10px;">
+                <div class="win-p-fill" style="width:${winRate}%; background:${winRate > 60 ? '#16a34a' : (winRate > 30 ? '#fbbf24' : '#ef4444')}; border-radius:10px;"></div>
+              </div>
+              <div class="cell-line" style="font-size:0.75rem; justify-content:space-between; margin-top: 2px;">
+                <span style="color:#16a34a">Won: <b>${s.wonCount}</b></span>
+                <span style="color:var(--text-muted)">Total: <b>${totalEffort}</b></span>
+                <span style="color:#ef4444">Lost: <b>${s.lostCount}</b></span>
+              </div>
             </div>
           </td>
 
-          <td style="font-weight: 800; background: #f8fafc; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--text-main); vertical-align: middle;">
+          <td style="font-weight: 800; background: rgba(79, 70, 229, 0.05); font-family: 'Outfit', sans-serif; font-size: 1rem; color: var(--primary); vertical-align: middle; border-left: 1px solid rgba(79, 70, 229, 0.1);">
             ₹${formatCurrency(s.total)}
           </td>
         `;
@@ -1752,13 +1847,13 @@
       }).join('');
     }
 
-    function updateCharts(ownerStats, stageTotals) {
+    function updateCharts(ownerStats, stageTotals, scopeTotals) {
       if (!window.Chart) return;
 
       // 1. Stage Chart (Doughnut)
       const stageCtx = document.getElementById('stageChart').getContext('2d');
       const stageLabels = ['Opportunity', 'Demo', 'Quote/Deal'];
-      const stageData = [stageTotals['Opportunity'], stageTotals['Demo'], stageTotals['Quote/Deal']];
+      const stageData = [stageTotals['Opportunity'] || 0, stageTotals['Demo'] || 0, stageTotals['Quote/Deal'] || 0];
 
       if (stageChart) {
         stageChart.data.datasets[0].data = stageData;
@@ -1821,6 +1916,40 @@
             }
           }
         });
+      }
+
+      // 3. Scope Chart (Doughnut)
+      if (scopeTotals) {
+        const scopeCtx = document.getElementById('scopeChart').getContext('2d');
+        const sortedScopes = Object.keys(scopeTotals).sort((a, b) => scopeTotals[b] - scopeTotals[a]);
+        const scopeDataValues = sortedScopes.map(s => scopeTotals[s]);
+
+        if (scopeChart) {
+          scopeChart.data.labels = sortedScopes;
+          scopeChart.data.datasets[0].data = scopeDataValues;
+          scopeChart.update();
+        } else {
+          scopeChart = new Chart(scopeCtx, {
+            type: 'doughnut',
+            data: {
+              labels: sortedScopes,
+              datasets: [{
+                data: scopeDataValues,
+                backgroundColor: ['#4f46e5', '#818cf8', '#6366f1', '#a5b4fc', '#cbd5e1', '#94a3b8', '#64748b'],
+                borderWidth: 0,
+                hoverOffset: 10
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, boxWidth: 8, font: { size: 10 } } }
+              },
+              cutout: '70%'
+            }
+          });
+        }
       }
     }
 
