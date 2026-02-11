@@ -1042,6 +1042,12 @@
       gap: 1.5rem;
     }
 
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .form-group {
       display: flex;
       flex-direction: column;
@@ -2630,7 +2636,7 @@
   <!-- New Record Modal -->
   <div class="modal-overlay" id="newRecordModal" style="backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.4);">
     <div class="modal-content"
-      style="border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: var(--shadow-lg);">
+      style="border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: var(--shadow-lg); overflow-y: auto;">
       <div class="modal-header"
         style="background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%); padding: 1.5rem 2rem; border: none;">
         <div style="display: flex; align-items: center; gap: 1rem;">
@@ -2726,7 +2732,7 @@
           <div id="modalStatus" class="status-msg" style="margin-top: 1rem;"></div>
         </div>
         <div class="modal-footer"
-          style="padding: 1.5rem 2rem; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem;">
+          style="padding: 1.5rem 2rem; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; position: sticky; bottom: 0; z-index: 10;">
           <button type="button" class="btn" onclick="closeNewRecordModal()"
             style="border:none; background:transparent; color:var(--text-muted); font-weight: 600;">Discard</button>
           <button type="submit" class="btn"
