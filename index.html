@@ -2415,11 +2415,28 @@
 
       try {
         // 1. Prepare the data to send
-        // const payload = {
-        //   rowData: rowData,
-        //   action: "updateRow"
-        // };
-        const payload = { ...rowData, rowIndex: parseInt(idx) + 2 }; // Often Google Sheets scripts need rowIndex (1-based + 1 for header)
+        const payload = {
+          ...rowData,
+          action: "updateRow",
+          rowIndex: parseInt(idx) + 2
+        };
+
+        // Convert date fields to ISO format as requested
+        const dateFields = ["Created Date", "Expected Closure"];
+        Object.keys(payload).forEach(key => {
+          const trimmedKey = key.trim();
+          if (dateFields.includes(trimmedKey)) {
+            const val = payload[key];
+            if (val && typeof val === "string" && val.includes("-")) {
+              try {
+                const d = new Date(val);
+                if (!isNaN(d.getTime())) {
+                  payload[key] = d.toISOString();
+                }
+              } catch (e) { }
+            }
+          }
+        });
 
 
         // 2. Call the Google Script via Fetch
@@ -2572,7 +2589,22 @@
 
     function closeNewRecordModal() {
       document.getElementById('newRecordModal').classList.remove('active');
-      document.getElementById('newRecordForm').reset();
+      const form = document.getElementById('newRecordForm');
+      form.reset();
+
+      // Reset button state
+      const btn = form.querySelector('button[type="submit"]');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Onboard Lead";
+      }
+
+      // Clear status
+      const status = document.getElementById('modalStatus');
+      if (status) {
+        status.textContent = "";
+        status.className = "status-msg";
+      }
     }
 
     async function submitNewRecord(event) {
@@ -2588,20 +2620,27 @@
       let maxSNo = 0;
       pipelineData.forEach(row => {
         const snoKey = Object.keys(row).find(k => k.trim().toLowerCase() === 's:no');
-        const sno = parseInt(row[snoKey]) || 0;
+        const snoValue = row[snoKey];
+        const sno = parseInt(snoValue) || 0;
         if (sno > maxSNo) maxSNo = sno;
       });
 
       // Add necessary system fields
       data.action = "addRow";
       data["S:No"] = maxSNo + 1;
-      data["Created Date"] = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+      // Use ISO format but adjust for local timezone so "Today" is accurate
+      const now = new Date();
+      const localDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+      data["Created Date"] = localDate.toISOString();
+
       if (!data.Status) data.Status = "Active";
 
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner" style="width:16px; height:16px; border-width:2px; margin-right:8px; display:inline-block; vertical-align:middle;"></span> Creating...`;
 
       try {
+        console.log("Adding New Lead:", data);
         await fetch(API_URL, {
           method: "POST",
           mode: "no-cors",
@@ -2616,14 +2655,13 @@
         setTimeout(() => {
           closeNewRecordModal();
           loadPipeline(true);
-          status.className = "status-msg";
         }, 2000);
       } catch (error) {
         console.error("Save failed:", error);
-        status.textContent = "❌ Failed to add record.";
+        status.textContent = "❌ Failed to add record. " + error.message;
         status.className = "status-msg status-error";
         btn.disabled = false;
-        btn.textContent = "Create Lead";
+        btn.textContent = "Onboard Lead";
       }
     }
     // Initial load
