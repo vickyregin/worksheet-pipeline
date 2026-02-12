@@ -1534,6 +1534,54 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
         </div>
+        <!-- New Stat Cards -->
+        <div class="stat-card">
+          <div class="stat-label">New Business Value</div>
+          <div class="stat-value" id="newBusinessValue" style="color: #10b981;">₹0</div>
+          <svg class="stat-icon-bg" style="color:#10b981" width="60" height="60" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="8.5" cy="7" r="4" />
+            <line x1="20" y1="8" x2="20" y2="14" />
+            <line x1="17" y1="11" x2="23" y2="11" />
+          </svg>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Existing Business Value</div>
+          <div class="stat-value" id="existingBusinessValue" style="color: #6366f1;">₹0</div>
+          <svg class="stat-icon-bg" style="color:#6366f1" width="60" height="60" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            <path d="M21 15V9" />
+            <path d="M18 12h6" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M9 14a6 6 0 0 0-6 6v1" />
+          </svg>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Series (Recurring) Value</div>
+          <div class="stat-value" id="seriesValue" style="color: #f59e0b;">₹0</div>
+          <svg class="stat-icon-bg" style="color:#f59e0b" width="60" height="60" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M21 2v6h-6" />
+            <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+            <path d="M3 22v-6h6" />
+            <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+          </svg>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">One Time Value</div>
+          <div class="stat-value" id="oneTimeValue" style="color: #3b82f6;">₹0</div>
+          <svg class="stat-icon-bg" style="color:#3b82f6" width="60" height="60" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <path d="M12 14l2 2 4-4" />
+          </svg>
+        </div>
       </div>
 
       <div class="analytics-grid">
@@ -1709,6 +1757,7 @@
                   <option value="RPKGG">RPKGG</option>
                   <option value="Frieght Farwarding">Frieght Farwarding</option>
                   <option value="EPKGG&FRTFF">EPKGG&FRTFF</option>
+                  <option value="MHE">MHE</option>
                 </select>
               </div>
             </div>
@@ -1935,6 +1984,10 @@
       document.getElementById("totalWonValue").textContent = `₹${formatCurrency(totalWon)}`;
       document.getElementById("totalLostValue").textContent = `₹${formatCurrency(totalLost)}`;
       document.getElementById("activeLeadsCount").textContent = activeLeads;
+      document.getElementById("newBusinessValue").textContent = `₹${formatCurrency(businessTypeTotals['New'])}`;
+      document.getElementById("existingBusinessValue").textContent = `₹${formatCurrency(businessTypeTotals['Existing'])}`;
+      document.getElementById("seriesValue").textContent = `₹${formatCurrency(billingModelTotals['Series'])}`;
+      document.getElementById("oneTimeValue").textContent = `₹${formatCurrency(billingModelTotals['One Time'])}`;
 
       updateFilterAnalytics(stats, stageTotals);
       updateCharts(stats, stageTotals, scopeTotals, businessTypeTotals, billingModelTotals);
@@ -2043,7 +2096,7 @@
     function updateCharts(ownerStats, stageTotals, scopeTotals, businessTypeTotals, billingModelTotals) {
       if (!window.Chart) return;
 
-      // 1. Stage Chart (Doughnut)
+      // 1. Stage Chart (Bar)
       const stageCtx = document.getElementById('stageChart').getContext('2d');
       const stageLabels = ['Opportunity', 'Demo', 'Quote/Deal'];
       const stageData = [stageTotals['Opportunity'] || 0, stageTotals['Demo'] || 0, stageTotals['Quote/Deal'] || 0];
@@ -2053,23 +2106,27 @@
         stageChart.update();
       } else {
         stageChart = new Chart(stageCtx, {
-          type: 'doughnut',
+          type: 'bar',
           data: {
             labels: stageLabels,
             datasets: [{
+              label: 'Pipeline Value',
               data: stageData,
               backgroundColor: ['#818cf8', '#fbbf24', '#4f46e5'],
-              borderWidth: 0,
-              hoverOffset: 10
+              borderRadius: 6,
+              barThickness: 30
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+              legend: { display: false }
             },
-            cutout: '70%'
+            scales: {
+              y: { beginAtZero: true, grid: { display: false }, ticks: { callback: v => '₹' + formatCompactValue(v) } },
+              x: { grid: { display: false } }
+            }
           }
         });
       }
@@ -2111,7 +2168,7 @@
         });
       }
 
-      // 3. Scope Chart (Doughnut)
+      // 3. Scope Chart (Horizontal Bar)
       if (scopeTotals) {
         const scopeCtx = document.getElementById('scopeChart').getContext('2d');
         const sortedScopes = Object.keys(scopeTotals).sort((a, b) => scopeTotals[b] - scopeTotals[a]);
@@ -2123,29 +2180,34 @@
           scopeChart.update();
         } else {
           scopeChart = new Chart(scopeCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
               labels: sortedScopes,
               datasets: [{
+                label: 'Value',
                 data: scopeDataValues,
-                backgroundColor: ['#4f46e5', '#818cf8', '#6366f1', '#a5b4fc', '#cbd5e1', '#94a3b8', '#64748b'],
-                borderWidth: 0,
-                hoverOffset: 10
+                backgroundColor: '#6366f1',
+                borderRadius: 4,
+                barThickness: 15
               }]
             },
             options: {
+              indexAxis: 'y',
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, boxWidth: 8, font: { size: 10 } } }
+                legend: { display: false }
               },
-              cutout: '70%'
+              scales: {
+                x: { grid: { display: false }, ticks: { callback: v => '₹' + formatCompactValue(v) } },
+                y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+              }
             }
           });
         }
       }
 
-      // 4. Business Type Chart (Doughnut)
+      // 4. Business Type Chart (Bar)
       if (businessTypeTotals) {
         const btCtx = document.getElementById('businessTypeChart').getContext('2d');
         const btData = [businessTypeTotals['New'] || 0, businessTypeTotals['Existing'] || 0];
@@ -2155,29 +2217,33 @@
           businessTypeChart.update();
         } else {
           businessTypeChart = new Chart(btCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
               labels: ['New Business', 'Existing Business'],
               datasets: [{
+                label: 'Value',
                 data: btData,
                 backgroundColor: ['#10b981', '#6366f1'],
-                borderWidth: 0,
-                hoverOffset: 10
+                borderRadius: 6,
+                barThickness: 40
               }]
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, boxWidth: 10, font: { size: 10 } } }
+                legend: { display: false }
               },
-              cutout: '70%'
+              scales: {
+                y: { beginAtZero: true, grid: { display: false }, ticks: { callback: v => '₹' + formatCompactValue(v) } },
+                x: { grid: { display: false } }
+              }
             }
           });
         }
       }
 
-      // 5. Billing Model Chart (Doughnut)
+      // 5. Billing Model Chart (Bar)
       if (billingModelTotals) {
         const bmCtx = document.getElementById('billingModelChart').getContext('2d');
         const bmData = [billingModelTotals['Series'] || 0, billingModelTotals['One Time'] || 0];
@@ -2187,23 +2253,27 @@
           billingModelChart.update();
         } else {
           billingModelChart = new Chart(bmCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
               labels: ['Series (Recurring)', 'One Time'],
               datasets: [{
+                label: 'Value',
                 data: bmData,
                 backgroundColor: ['#f59e0b', '#3b82f6'],
-                borderWidth: 0,
-                hoverOffset: 10
+                borderRadius: 6,
+                barThickness: 40
               }]
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, boxWidth: 10, font: { size: 10 } } }
+                legend: { display: false }
               },
-              cutout: '70%'
+              scales: {
+                y: { beginAtZero: true, grid: { display: false }, ticks: { callback: v => '₹' + formatCompactValue(v) } },
+                x: { grid: { display: false } }
+              }
             }
           });
         }
@@ -2502,6 +2572,7 @@
                       <option value="RPKGG" ${getVal("Scope") === "RPKGG" ? "selected" : ""}>RPKGG</option>
                       <option value="Frieght Farwarding" ${getVal("Scope") === "Frieght Farwarding" ? "selected" : ""}>Frieght Farwarding</option>
                       <option value="EPKGG&FRTFF" ${getVal("Scope") === "EPKGG&FRTFF" ? "selected" : ""}>EPKGG&FRTFF</option>
+                      <option value="MHE" ${getVal("Scope") === "MHE" ? "selected" : ""}>MHE</option>
                     </select>
                   </div>
                 </div>
@@ -3018,6 +3089,13 @@
               </select>
             </div>
             <div class="form-group">
+              <label class="form-label">Billing Model</label>
+              <select name="Recurring/One Time" class="form-input">
+                <option value="One Time">One Time</option>
+                <option value="Series">Series</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label class="form-label">Deal Scope</label>
               <select name="Scope" class="form-input">
                 <option value="">Select Scope</option>
@@ -3029,6 +3107,7 @@
                 <option value="RPKGG">RPKGG</option>
                 <option value="Frieght Farwarding">Frieght Farwarding</option>
                 <option value="EPKGG&FRTFF">EPKGG&FRTFF</option>
+                <option value="MHE">MHE</option>
               </select>
             </div>
             <div class="form-group">
